@@ -26,6 +26,13 @@ class Point:
         azimuth = Point.quarter(dx, dy, azimuth)
         return [math.degrees(azimuth), round(distance,5)]
 
+
+    @staticmethod
+    def angle(point_l, point_c, point_r):
+        angle=point_r.azimuth(point_c)[0]-point_l.azimuth(point_c)[0]
+        if angle<0: angle+=360
+        return angle
+
     @staticmethod
     def quarter(dx, dy, azimuth):
         if dx > 0 and dy < 0: azimuth += (math.pi / 2)
@@ -36,22 +43,31 @@ class Point:
     @staticmethod
     def go_by_azimuth(start_point):
         stack = [start_point]
-        polygon = [start_point]
         observations = {}
+        angles={}
+        angle_point=[start_point]
         while stack:
             point = stack.pop()
             for next_point in point.next_points:
                 stack.append(next_point)
-                polygon.append(next_point)
+                angle_point.append(next_point)
+                # if len(angle_point)>3:
+                #     del angle_point[0]
+                # if len(angle_point)==3:
+                #     angles[(angle_point[0], angle_point[1], angle_point[2])]=Point.angle(angle_point[0], angle_point[1], angle_point[2])
+
                 observations[(point, next_point)] = point.azimuth(next_point)
 
-        return [polygon, observations]
+        return [observations, angle_point]
 
     @staticmethod
     def print_observation(start_point):
-        observations=Point.go_by_azimuth(start_point)[1]
+        observations=Point.go_by_azimuth(start_point)[0]
         for observation in observations:
             print(observation, observations[observation])
+        angles=Point.go_by_azimuth(start_point)[1]
+        for angle in angles:
+            print(angle)
 
 
 
@@ -76,16 +92,7 @@ if __name__ == "__main__":
 
 
     Point.print_observation(p1)
-    #
-    print(p1.azimuth(p2))
-    print(p1.azimuth(p3))
-    print(p1.azimuth(p4))
-    print(p1.azimuth(p5))
 
-    print(p2.azimuth(p3))
-    print(p3.azimuth(p2))
-    print(p5.azimuth(p2))
-    print(p2.azimuth(p5))
 
 
 
